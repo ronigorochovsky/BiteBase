@@ -1,0 +1,27 @@
+cd "G:\Claude Code working dir\BiteBase\"
+npm run dev
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+"/c/Program Files/nodejs/node.exe" --env-file=.env.local "g:/Claude Code working dir/BiteBase/scripts/batch-extract-whatsapp.mjs" --limit=50
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+http://localhost:3000/
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Role: You are an Expert UI/UX Developer and Frontend Engineer.
+
+Objective: Conduct a comprehensive UI/UX audit of the "BiteBase" codebase, report findings, and after approval actively apply code changes to fix them.
+
+Focus Areas for Audit:
+- Layout & Structural Stability: Eliminate layout shifts (e.g., ensure uniform page constraints so the layout doesn't jump or change height or width when navigating between tabs or views with varying content).
+- Consistency: Standardize padding, margins, typography, color usage, and alignment across all components.
+- Responsiveness: Ensure fluid and correct behavior across mobile, tablet, and desktop views.
+- UX Polish: Improve visual feedback, interactive states (hover/active), and basic accessibility.
+
+Execution Steps (Perform strictly in this order):
+1. Scan & Analyze: Review the frontend source code files responsible for the user interface served at http://localhost:3000/.
+2. Report: Output a concise audit list. Format each finding as: 
+   [Impact Level: High/Medium/Low] - [1-line explanation of the issue and the specific fix you plan to apply].
+3. Act & Fix (Proactive Mode): After my permission for each audit, automatically use your file editing tools to implement the code changes required to resolve the issues you identified. Ensure your code edits are clean, modular, and match the project's existing styling framework.

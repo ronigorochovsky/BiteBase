@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1775388584606,
+      "tag": "0000_even_living_tribunal",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1775412867496,
+      "tag": "0001_panoramic_doctor_faustus",
+      "breakpoints": true
+    }
+    ,{
+      "idx": 2,
+      "version": "7",
+      "when": 1775500000000,
+      "tag": "0002_add_comments",
+      "breakpoints": true
+    }
+  ]
+}

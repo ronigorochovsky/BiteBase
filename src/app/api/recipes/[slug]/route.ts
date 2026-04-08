@@ -1,0 +1,38 @@
+import { db } from "@/db";
+import { recipes } from "@/db/schema";
+import { eq } from "drizzle-orm";
+
+// PATCH /api/recipes/[slug]
+export async function PATCH(
+  request: Request,
+  { params }: { params: { slug: string } }
+) {
+  const body = await request.json();
+
+  await db
+    .update(recipes)
+    .set({
+      title: body.title,
+      category: body.category as never,
+      subcategory: body.subcategory || null,
+      description: body.description || null,
+      ingredients: body.ingredients || null,
+      steps: body.steps || null,
+      tips: body.tips || null,
+      source_url: body.source_url || "",
+      image_url: body.image_url || null,
+      updated_at: new Date(),
+    })
+    .where(eq(recipes.slug, params.slug));
+
+  return Response.json({ ok: true });
+}
+
+// DELETE /api/recipes/[slug]
+export async function DELETE(
+  _request: Request,
+  { params }: { params: { slug: string } }
+) {
+  await db.delete(recipes).where(eq(recipes.slug, params.slug));
+  return Response.json({ ok: true });
+}

@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@14 . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git)",
+      "Bash(npm --version)",
+      "Read(//c/Users/Roni Gorochovsky/AppData/Roaming/**)",
+      "Read(//c/Users/Roni Gorochovsky/**)",
+      "Read(//c/Users/Roni Gorochovsky/AppData/Local/**)",
+      "Bash(powershell.exe -Command \"Get-Command node -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source; [System.Environment]::GetEnvironmentVariable\\('PATH', 'Machine'\\) -split ';' | Select-String -Pattern 'node' -SimpleMatch\")",
+      "Bash(\"/c/Program Files/nodejs/node.exe\" --version)",
+      "Bash(\"/c/Program Files/nodejs/npm.cmd\" --version)",
+      "Bash(export PATH=\"/c/Program Files/nodejs:$PATH\")",
+      "Bash(npm install:*)",
+      "Bash(npm show:*)",
+      "Bash(node -e \"const d=require\\('./recipes_output.json'\\); console.log\\('Total recipes:', d.length\\); const cats={}; d.forEach\\(r=>cats[r.category]=\\(cats[r.category]||0\\)+1\\); console.log\\('By category:', JSON.stringify\\(cats,null,2\\)\\); console.log\\('Fields in first item:', Object.keys\\(d[0]\\)\\);\" \"g:/Claude Code working dir/BiteBase/recipes_output.json\")",
+      "Bash(node -e \"const fs=require\\('fs'\\); const d=JSON.parse\\(fs.readFileSync\\('recipes_output.json','utf8'\\)\\); console.log\\('Total:', d.length\\); const cats={}; d.forEach\\(r=>cats[r.category]=\\(cats[r.category]||0\\)+1\\); console.log\\(JSON.stringify\\(cats\\)\\); console.log\\('Keys:', Object.keys\\(d[0]\\).join\\(', '\\)\\);\")",
+      "Bash(python extract_recipes.py --url \"https://www.instagram.com/reel/DUlckELCMSS/?igsh=b3dpZ3RhOXF0ZHJj\" /tmp/test_out.json)",
+      "Bash(\"C:/Users/Roni Gorochovsky/yt-dlp.exe\" --cookies-from-browser firefox --skip-download --print description \"https://www.instagram.com/reel/DUlckELCMSS/\")",
+      "Bash(cmd /c \"cd /d \\\\\"g:\\\\Claude Code working dir\\\\BiteBase\\\\\" && npm run db:generate\")",
+      "Bash('/c/Program Files/nodejs/node.exe' --env-file=.env.local -e ':*)",
+      "Bash(\"/c/Program Files/nodejs/node.exe\" --env-file=\"g:/Claude Code working dir/BiteBase/.env.local\" -e \"const {neon}=require\\('@neondatabase/serverless'\\);const sql=neon\\(process.env.DATABASE_URL\\);sql\\\\`ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS user_rating integer\\\\`.then\\(\\(\\)=>console.log\\('done'\\)\\).catch\\(e=>console.error\\(e\\)\\)\")"
+    ]
+  }
+}
