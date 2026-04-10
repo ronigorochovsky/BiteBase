@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { Input, Textarea } from "@/components/ui/Input";
 
 interface Comment {
   id: string;
@@ -113,6 +114,7 @@ export function CommentsSection({ recipeSlug }: CommentsSectionProps) {
                     onClick={() => setConfirmDeleteId(c.id)}
                     className="flex-shrink-0 text-gray-300 hover:text-red-400 transition-colors"
                     title="מחק תגובה"
+                    aria-label="מחק תגובה"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="3 6 5 6 21 6" />
@@ -132,26 +134,25 @@ export function CommentsSection({ recipeSlug }: CommentsSectionProps) {
       {/* Add comment form */}
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <h3 className="text-sm font-semibold text-gray-700">הוסף תגובה</h3>
-        <input
+        <Input
           value={authorName}
           onChange={(e) => setAuthorName(e.target.value)}
           placeholder="שמך"
           maxLength={80}
-          className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
         />
-        <textarea
+        <Textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="כתוב תגובה..."
           rows={3}
           maxLength={1000}
-          className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
+          className="resize-none"
         />
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           type="submit"
           disabled={!authorName.trim() || !content.trim() || submitting}
-          className="self-start px-5 py-2 bg-brand-500 text-white rounded-xl text-sm font-medium hover:bg-brand-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="self-start px-5 py-2 bg-purple-600 text-white rounded-xl text-sm font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting ? "שולח..." : "פרסם תגובה"}
         </button>

@@ -27,7 +27,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="he" dir="rtl" className={notoHebrew.variable}>
-      <body className="font-sans min-h-screen flex flex-col">{children}</body>
+      <body className="font-sans min-h-screen flex flex-col">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:start-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-gray-900 focus:rounded-lg focus:shadow-lg focus:border focus:border-stone-300 focus:text-sm focus:font-medium"
+        >
+          דלג לתוכן הראשי
+        </a>
+        {children}
+      </body>
     </html>
   );
 }

@@ -171,7 +171,7 @@ export function EditRestaurantButton({ restaurant }: { restaurant: Restaurant })
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 flex-shrink-0">
               <h2 className="font-semibold text-gray-900 text-lg">עריכת מסעדה</h2>
-              <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-700 transition-colors">
+              <button onClick={() => setOpen(false)} className="p-1.5 text-gray-400 hover:text-gray-700 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
@@ -235,7 +235,7 @@ export function EditRestaurantButton({ restaurant }: { restaurant: Restaurant })
               </div>
 
               {/* Area + Concept in a row */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-medium text-gray-500">אזור</label>
                   <select
@@ -258,13 +258,13 @@ export function EditRestaurantButton({ restaurant }: { restaurant: Restaurant })
               {field("כתובת", "address", { placeholder: "רחוב, עיר..." })}
 
               {/* Phone + Opening hours */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {field("טלפון", "phone", { placeholder: "050-000-0000", type: "tel" })}
                 {field("שעות פתיחה", "opening_hours", { placeholder: "א-ה 12:00-23:00..." })}
               </div>
 
               {/* Google score + Price range + User rating */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {field("ציון גוגל", "google_score", { placeholder: "4.5" })}
                 {field("טווח מחירים", "price_range", { placeholder: "₪, ₪₪, ₪₪₪" })}
                 {field("דירוג שלי (0-5)", "user_rating", { placeholder: "4", type: "number" })}

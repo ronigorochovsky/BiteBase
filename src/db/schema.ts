@@ -95,6 +95,7 @@ export const restaurants = pgTable("restaurants", {
   lat: doublePrecision("lat"),
   lng: doublePrecision("lng"),
   user_rating: integer("user_rating"),
+  extra_locations: text("extra_locations"), // JSON: [{lat,lng,address,area}]
   status: entryStatusEnum("status").notNull().default("published"),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),

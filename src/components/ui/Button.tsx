@@ -10,17 +10,17 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses = {
   primary:
-    "bg-brand-500 text-white hover:bg-brand-600 disabled:bg-brand-300",
+    "bg-brand-500 text-white hover:bg-brand-600 disabled:bg-brand-300 focus:ring-brand-400",
   secondary:
-    "bg-white text-gray-700 border border-stone-300 hover:bg-stone-50 disabled:opacity-50",
+    "bg-white text-gray-700 border border-stone-300 hover:bg-stone-50 disabled:opacity-50 focus:ring-brand-400",
   ghost:
-    "bg-transparent text-gray-600 hover:bg-stone-100 disabled:opacity-50",
+    "bg-transparent text-gray-600 hover:bg-stone-100 disabled:opacity-50 focus:ring-brand-400",
   danger:
-    "bg-red-500 text-white hover:bg-red-600 disabled:bg-red-300",
+    "bg-red-500 text-white hover:bg-red-600 disabled:bg-red-300 focus:ring-red-400",
   green:
-    "bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-emerald-300",
+    "bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-emerald-300 focus:ring-emerald-400",
   purple:
-    "bg-purple-600 text-white hover:bg-purple-700 disabled:bg-purple-300",
+    "bg-purple-600 text-white hover:bg-purple-700 disabled:bg-purple-300 focus:ring-purple-400",
 };
 
 const sizeClasses = {
@@ -41,7 +41,7 @@ export function Button({
   return (
     <button
       className={cn(
-        "font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-1",
+        "font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1",
         variantClasses[variant],
         sizeClasses[size],
         (disabled || loading) && "cursor-not-allowed",

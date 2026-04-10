@@ -1,18 +1,40 @@
 export default function Loading() {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
-      <div className="h-8 w-40 bg-stone-200 rounded-lg animate-pulse mb-2" />
-      <div className="h-4 w-56 bg-stone-100 rounded animate-pulse mb-8" />
-      <div className="flex gap-2 mb-8">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-8 w-20 bg-stone-200 rounded-full animate-pulse" />
-        ))}
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="bg-stone-200 rounded-2xl h-56 animate-pulse" />
-        ))}
-      </div>
-    </div>
+    <>
+      {/* Navbar placeholder */}
+      <div className="h-14 bg-white border-b border-stone-200" />
+      <main className="max-w-7xl mx-auto px-4 py-10 flex-1">
+        {/* Header */}
+        <div className="h-9 bg-stone-200 rounded w-40 mb-2 animate-pulse" />
+        <div className="h-4 bg-stone-100 rounded w-56 mb-8 animate-pulse" />
+        <div className="flex gap-8 items-start">
+          {/* Sidebar skeleton */}
+          <aside className="w-60 flex-shrink-0 hidden lg:block">
+            <div className="flex flex-col gap-2">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="h-9 bg-stone-200 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          </aside>
+          {/* Main content skeleton */}
+          <div className="flex-1 min-w-0">
+            <div className="h-10 bg-stone-200 rounded-xl mb-6 animate-pulse" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="rounded-2xl bg-white border border-stone-200 overflow-hidden animate-pulse">
+                  <div className="h-48 bg-stone-200" />
+                  <div className="p-4 flex flex-col gap-2">
+                    <div className="h-3 bg-stone-200 rounded w-1/3" />
+                    <div className="h-5 bg-stone-200 rounded w-3/4" />
+                    <div className="h-3 bg-stone-200 rounded w-full" />
+                    <div className="h-3 bg-stone-200 rounded w-2/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </main>
+    </>
   );
 }

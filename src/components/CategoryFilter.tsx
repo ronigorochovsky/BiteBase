@@ -1,5 +1,6 @@
 "use client";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 interface FilterOption {
@@ -26,7 +27,20 @@ export function CategoryFilter({
   const searchParams = useSearchParams();
   const current = searchParams.get(paramName) ?? "";
 
+  // Restore last selected filter when navigating back without URL params
+  useEffect(() => {
+    if (!current) {
+      const stored = sessionStorage.getItem(`bitebase-filter-${paramName}`) ?? "";
+      if (stored) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set(paramName, stored);
+        router.replace(`${pathname}?${params.toString()}`);
+      }
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const setFilter = (value: string) => {
+    sessionStorage.setItem(`bitebase-filter-${paramName}`, value);
     const params = new URLSearchParams(searchParams.toString());
     if (value) {
       params.set(paramName, value);

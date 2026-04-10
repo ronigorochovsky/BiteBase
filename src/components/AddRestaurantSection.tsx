@@ -132,7 +132,7 @@ export function AddRestaurantSection({ className }: { className?: string }) {
                   className="flex-1"
                   onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                 />
-                <Button variant="green" onClick={handleSubmit} loading={step === "loading"} disabled={!url.trim()}>
+                <Button variant="green" onClick={handleSubmit} loading={step === "loading"} disabled={!url.trim()} className="flex-shrink-0">
                   {step === "loading" ? "מנתח..." : "הוסף"}
                 </Button>
               </div>

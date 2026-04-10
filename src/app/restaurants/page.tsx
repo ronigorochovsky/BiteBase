@@ -8,6 +8,7 @@ import { RestaurantCard } from "@/components/RestaurantCard";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { SearchBar } from "@/components/SearchBar";
 import { Navbar } from "@/components/Navbar";
+import { MobileFilterDrawer } from "@/components/MobileFilterDrawer";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -64,20 +65,27 @@ async function RestaurantList({ area, q, concept, minRating }: { area?: string; 
     .where(and(...conditions))
     .orderBy(desc(restaurants.created_at));
 
-  if (items.length === 0) {
-    return (
-      <div className="text-center py-20 text-gray-400">
-        <div className="text-5xl mb-4">🍴</div>
-        <p className="text-lg">לא נמצאו מסעדות</p>
-      </div>
-    );
-  }
+  const padCount = items.length === 0 ? 3 : (3 - (items.length % 3)) % 3;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-      {items.map((restaurant) => (
-        <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-      ))}
+    <div className="relative">
+      {items.length === 0 && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 z-10 py-20">
+          <div className="text-5xl mb-4">🍴</div>
+          <p className="text-lg">לא נמצאו מסעדות</p>
+        </div>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+        {items.map((restaurant) => (
+          <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+        ))}
+        {Array.from({ length: padCount }).map((_, i) => (
+          <div key={`pad-${i}`} className="flex flex-col rounded-2xl bg-white border border-stone-200 overflow-hidden opacity-0 pointer-events-none" aria-hidden="true">
+            <div className="h-48 bg-stone-100" />
+            <div className="p-4 flex-1" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -109,9 +117,9 @@ export default function RestaurantsPage({ searchParams }: Props) {
   return (
     <>
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 py-10 flex-1">
-        {/* Header + view tabs */}
-        <div className="flex items-start justify-between gap-4 mb-8 flex-wrap">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 py-10 flex-1">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2 sm:gap-4 mb-4 sm:mb-8 flex-wrap">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-1">
               {areaLabel ? areaLabel : "מסעדות"}
@@ -131,9 +139,9 @@ export default function RestaurantsPage({ searchParams }: Props) {
           </div>
         </div>
 
-        <div className="flex gap-8 items-start">
+        <div className="grid gap-8 items-start lg:grid-cols-[240px_minmax(0,1fr)]">
           {/* ── Sticky right sidebar (filters) ── */}
-          <aside className="w-60 flex-shrink-0 hidden lg:block sticky top-[72px] self-start">
+          <aside className="hidden lg:block sticky top-[72px] self-start">
             <div className="flex flex-col gap-5 max-h-[calc(100vh-6rem)] overflow-y-auto">
               <div>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">אזורים</p>
@@ -172,8 +180,41 @@ export default function RestaurantsPage({ searchParams }: Props) {
           </aside>
 
           {/* ── Main content ── */}
-          <div className="flex-1 min-w-0">
-            <div className="mb-5">
+          <div className="min-w-0">
+            <Suspense>
+              <MobileFilterDrawer label="סינון">
+                <div className="flex flex-col gap-5">
+                  <div>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">אזורים</p>
+                    <CategoryFilter
+                      options={areaFilterOptions}
+                      paramName="area"
+                      allLabel="כל האזורים"
+                      activeClass="bg-emerald-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">סגנון מטבח</p>
+                    <CategoryFilter
+                      options={conceptFilterOptions}
+                      paramName="concept"
+                      allLabel="כל הסגנונות"
+                      activeClass="bg-emerald-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">דירוג</p>
+                    <CategoryFilter
+                      options={ratingFilterOptions}
+                      paramName="minRating"
+                      allLabel="כל הדירוגים"
+                      activeClass="bg-emerald-600 text-white"
+                    />
+                  </div>
+                </div>
+              </MobileFilterDrawer>
+            </Suspense>
+            <div className="mb-6">
               <Suspense>
                 <SearchBar placeholder="חיפוש לפי שם, סגנון, כתובת..." />
               </Suspense>
@@ -186,6 +227,15 @@ export default function RestaurantsPage({ searchParams }: Props) {
           </div>
         </div>
       </main>
+
+      {/* Floating sticky map button — stays visible while scrolling */}
+      <Link
+        href="/restaurants/map"
+        className="fixed bottom-6 start-6 z-50 flex items-center gap-2 px-5 py-3 rounded-full bg-stone-200 text-gray-700 text-sm font-semibold shadow-lg hover:bg-emerald-600 hover:text-white active:bg-emerald-700 active:text-white transition-colors"
+        aria-label="עבור למפת המסעדות"
+      >
+        🗺️ מפה
+      </Link>
     </>
   );
 }

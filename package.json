@@ -9,7 +9,10 @@
     "lint": "next lint",
     "db:generate": "node --env-file=.env.local ./node_modules/drizzle-kit/bin.cjs generate",
     "db:migrate": "node --env-file=.env.local ./node_modules/drizzle-kit/bin.cjs migrate",
-    "db:studio": "node --env-file=.env.local ./node_modules/drizzle-kit/bin.cjs studio"
+    "db:studio": "node --env-file=.env.local ./node_modules/drizzle-kit/bin.cjs studio",
+    "db:sync": "node --env-file=.env.local scripts/sync-restaurants.mjs && node --env-file=.env.local scripts/sync-recipes.mjs",
+    "db:sync:restaurants": "node --env-file=.env.local scripts/sync-restaurants.mjs",
+    "db:sync:recipes": "node --env-file=.env.local scripts/sync-recipes.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",
@@ -34,6 +37,7 @@
     "drizzle-kit": "^0.24.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.29",
+    "playwright": "^1.59.1",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
     "typescript": "^5"

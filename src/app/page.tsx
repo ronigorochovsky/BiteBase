@@ -28,10 +28,10 @@ export default async function HomePage() {
   const counts = await getCounts();
 
   return (
-    <main className="flex-1">
+    <main id="main-content" className="flex-1">
       {/* Hero */}
       <section className="bg-gradient-to-b from-brand-600 to-brand-700 text-white py-20 px-4 text-center">
-        <h1 className="text-5xl font-bold mb-4 tracking-tight">🍽 BiteBase</h1>
+        <h1 className="text-3xl sm:text-5xl font-bold mb-4 tracking-tight">🍽 BiteBase</h1>
         <p className="text-xl text-brand-100 max-w-md mx-auto">
           האוסף האישי שלי — מתכונים ומסעדות אהובות
         </p>
@@ -47,14 +47,14 @@ export default async function HomePage() {
               href="/recipes"
               className="group relative overflow-hidden rounded-2xl bg-white shadow-md hover:shadow-xl transition-shadow border border-stone-200"
             >
-              <div className="bg-purple-50 p-8 text-center">
+              <div className="bg-purple-50 p-5 md:p-8 text-center">
                 <div className="text-6xl mb-4">🥘</div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">מתכונים</h2>
                 <p className="text-gray-500 mb-4">
                   {counts.recipes > 0 ? `${counts.recipes} מתכונים` : "מתכונים שאוהבים לבשל"}
                 </p>
                 <span className="inline-block bg-purple-600 text-white px-5 py-2 rounded-full text-sm font-medium group-hover:bg-purple-700 transition-colors">
-                  לצפייה במתכונים ←
+                  ← לצפייה במתכונים
                 </span>
               </div>
             </Link>
@@ -67,14 +67,14 @@ export default async function HomePage() {
               href="/restaurants"
               className="group relative overflow-hidden rounded-2xl bg-white shadow-md hover:shadow-xl transition-shadow border border-stone-200"
             >
-              <div className="bg-emerald-50 p-8 text-center">
+              <div className="bg-emerald-50 p-5 md:p-8 text-center">
                 <div className="text-6xl mb-4">🍴</div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">מסעדות</h2>
                 <p className="text-gray-500 mb-4">
                   {counts.restaurants > 0 ? `${counts.restaurants} מסעדות` : "מסעדות שממליצים עליהן"}
                 </p>
                 <span className="inline-block bg-emerald-600 text-white px-5 py-2 rounded-full text-sm font-medium group-hover:bg-emerald-700 transition-colors">
-                  לצפייה במסעדות ←
+                  ← לצפייה במסעדות
                 </span>
               </div>
             </Link>

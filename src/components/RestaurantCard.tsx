@@ -12,7 +12,7 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
   return (
     <Link
       href={`/restaurants/${restaurant.slug}`}
-      className="group block bg-white rounded-2xl border border-stone-200 overflow-hidden hover:shadow-md transition-shadow"
+      className="group flex flex-col bg-white rounded-2xl border border-stone-200 overflow-hidden hover:shadow-md transition-shadow h-full"
     >
       {/* Image */}
       <div className="relative h-48 bg-stone-100">
@@ -45,7 +45,7 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col">
+      <div className="p-4 flex flex-col flex-1">
         <div className="flex items-center gap-2 mb-2 flex-wrap">
           <Badge variant="green">
             {RESTAURANT_AREA_LABELS[restaurant.area]}

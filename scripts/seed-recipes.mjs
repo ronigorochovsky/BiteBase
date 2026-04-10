@@ -17,24 +17,6 @@ const VALID_SUBCATEGORIES = [
   "pasta_pizza_dough","cooked_vegetables","alcoholic","smoothies","other"
 ];
 
-const BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
-
-async function fetchOgImage(url) {
-  try {
-    const res = await fetch(url, {
-      headers: { "User-Agent": BROWSER_UA, Accept: "text/html,*/*" },
-      signal: AbortSignal.timeout(6000),
-    });
-    if (!res.ok) return null;
-    const html = await res.text();
-    const match = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
-      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
-    return match?.[1] ?? null;
-  } catch {
-    return null;
-  }
-}
-
 function generateSlug(title, id) {
   const idPrefix = id.replace(/-/g, "").slice(0, 8);
   const ascii = title
@@ -48,8 +30,10 @@ function generateSlug(title, id) {
 }
 
 async function main() {
+  const fileArg = process.argv.find(a => a.startsWith("--file="))?.slice("--file=".length);
+  const fileName = fileArg ?? "recipes_output.json";
   const data = JSON.parse(
-    readFileSync(join(__dirname, "../recipes_output.json"), "utf8")
+    readFileSync(join(__dirname, `../${fileName}`), "utf8")
   );
 
   // Filter out invalid entries
@@ -73,9 +57,9 @@ async function main() {
       ? item.instructions.join("\n")
       : (item.instructions ?? null);
 
-    process.stdout.write(`[${i + 1}/${valid.length}] ${item.name} — fetching image...`);
-    const image_url = await fetchOgImage(item.source_url);
-    console.log(image_url ? " ✓" : " (no image)");
+    // image_url is captured by Microlink during batch extraction — use it directly
+    const image_url = item.image_url ?? null;
+    process.stdout.write(`[${i + 1}/${valid.length}] ${item.name}${image_url ? " 🖼" : ""}\n`);
 
     const id = randomUUID();
     const slug = generateSlug(item.name, id);
@@ -91,7 +75,7 @@ async function main() {
           ${subcategory}::recipe_subcategory,
           ${ingredients},
           ${steps},
-          ${item.source_url},
+          ${item.source_url ?? ""},
           ${image_url},
           'published'::entry_status,
           NOW(),

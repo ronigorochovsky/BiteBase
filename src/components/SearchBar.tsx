@@ -47,7 +47,6 @@ export function SearchBar({ placeholder = "חיפוש..." }: SearchBarProps) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        onBlur={() => applySearch(value)}
         placeholder={placeholder}
         className="w-full ps-9 pe-9 py-2 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
       />

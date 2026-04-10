@@ -5,6 +5,8 @@
 @layer base {
   html {
     direction: rtl;
+    overflow-y: scroll; /* always show scrollbar — prevents 15px width shift between tabs */
+    scrollbar-gutter: stable; /* reserve gutter space even when scrollbar is not needed */
   }
 
   body {

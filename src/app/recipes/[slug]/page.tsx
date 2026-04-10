@@ -51,13 +51,13 @@ export default async function RecipePage({ params }: Props) {
   return (
     <>
       <Navbar />
-      <main className="max-w-5xl mx-auto px-4 py-10">
+      <main id="main-content" className="max-w-5xl mx-auto px-4 py-10">
         {/* Back */}
         <Link
           href="/recipes"
           className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 mb-6 transition-colors"
         >
-          ← חזרה למתכונים
+          → חזרה למתכונים
         </Link>
 
         {/* Image */}
@@ -85,6 +85,7 @@ export default async function RecipePage({ params }: Props) {
             )}
             <div className="ms-auto flex items-center gap-2">
               <EditRecipeButton recipe={recipe} />
+              <DeleteRecipeButton slug={recipe.slug} name={recipe.title} />
               <FavoriteButton recipeId={recipe.id} size="md" />
             </div>
           </div>
@@ -102,7 +103,7 @@ export default async function RecipePage({ params }: Props) {
             <h2 className="text-xl font-semibold text-gray-900 mb-3 pb-2 border-b border-stone-200">
               מצרכים
             </h2>
-            <ul className="space-y-1.5">
+            <ul role="list" className="space-y-1.5">
               {ingredientLines.map((line, i) => (
                 <li key={i} className="flex items-start gap-2 text-gray-700">
                   <span className="text-purple-500 mt-1">•</span>
@@ -144,6 +145,10 @@ export default async function RecipePage({ params }: Props) {
           </section>
         )}
 
+        {ingredientLines.length === 0 && stepLines.length === 0 && (
+          <p className="text-gray-400 py-4 text-center">אין מידע על מתכון זה עדיין.</p>
+        )}
+
         {/* Source link + delete */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           {recipe.source_url && recipe.source_url !== "" ? (
@@ -158,7 +163,6 @@ export default async function RecipePage({ params }: Props) {
           ) : (
             <span />
           )}
-          <DeleteRecipeButton slug={recipe.slug} />
         </div>
 
         {/* Comments */}

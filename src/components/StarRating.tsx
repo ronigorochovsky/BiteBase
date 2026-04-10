@@ -32,7 +32,7 @@ export function StarRating({ slug, initialRating }: Props) {
   return (
     <div className="flex items-center gap-3">
       <span className="text-sm text-gray-500 font-medium">הדירוג שלי:</span>
-      <div className="flex items-center gap-0.5">
+      <div role="group" aria-label="דירוג" className="flex items-center gap-0.5">
         {[1, 2, 3, 4, 5].map((n) => (
           <button
             key={n}

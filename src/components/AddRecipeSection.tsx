@@ -179,6 +179,7 @@ export function AddRecipeSection({ className }: { className?: string }) {
         </div>
 
         <div className="px-6 py-5">
+          <div className="transition-all duration-300">
 
           {/* ── URL input ── */}
           {(step === "idle" || step === "loading") && (
@@ -191,7 +192,7 @@ export function AddRecipeSection({ className }: { className?: string }) {
                   className="flex-1"
                   onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                 />
-                <Button variant="purple" onClick={handleSubmit} loading={step === "loading"} disabled={!url.trim()}>
+                <Button variant="purple" onClick={handleSubmit} loading={step === "loading"} disabled={!url.trim()} className="flex-shrink-0">
                   {step === "loading" ? "מנתח..." : "הוסף"}
                 </Button>
               </div>
@@ -340,6 +341,7 @@ export function AddRecipeSection({ className }: { className?: string }) {
             </div>
           )}
 
+          </div>
         </div>
       </div>
     </section>

@@ -9,6 +9,7 @@ import { RecipeTabs } from "@/components/RecipeTabs";
 import { FavoritesList } from "@/components/FavoritesList";
 import { SearchBar } from "@/components/SearchBar";
 import { Navbar } from "@/components/Navbar";
+import { MobileFilterDrawer } from "@/components/MobileFilterDrawer";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -50,20 +51,29 @@ async function RecipeList({ category, subcategory, q }: { category?: string; sub
     .where(and(...conditions))
     .orderBy(desc(recipes.created_at));
 
-  if (items.length === 0) {
-    return (
-      <div className="text-center py-20 text-gray-400">
-        <div className="text-5xl mb-4">🥘</div>
-        <p className="text-lg">אין מתכונים עדיין בקטגוריה זו</p>
-      </div>
-    );
-  }
+  const rowPad = items.length === 0 ? 3 : (3 - (items.length % 3)) % 3;
+  const minPad = Math.max(0, 6 - items.length);
+  const padCount = Math.max(rowPad, minPad);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-      {items.map((recipe) => (
-        <RecipeCard key={recipe.id} recipe={recipe} />
-      ))}
+    <div className="relative">
+      {items.length === 0 && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 z-10 py-20">
+          <div className="text-5xl mb-4">🥘</div>
+          <p className="text-lg">אין מתכונים עדיין בקטגוריה זו</p>
+        </div>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+        {items.map((recipe) => (
+          <RecipeCard key={recipe.id} recipe={recipe} />
+        ))}
+        {Array.from({ length: padCount }).map((_, i) => (
+          <div key={`pad-${i}`} className="flex flex-col rounded-2xl bg-white border border-stone-200 overflow-hidden opacity-0 pointer-events-none" aria-hidden="true">
+            <div className="h-48 bg-stone-100" />
+            <div className="p-4 flex-1" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -82,7 +92,7 @@ export default function RecipesPage({ searchParams }: Props) {
   return (
     <>
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 py-10 flex-1">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 py-10 flex-1">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-1">{categoryLabel ?? "מתכונים"}</h1>
@@ -91,9 +101,9 @@ export default function RecipesPage({ searchParams }: Props) {
           </p>
         </div>
 
-        <div className="flex gap-8 items-start">
+        <div className="grid gap-8 items-start lg:grid-cols-[240px_minmax(0,1fr)]">
           {/* ── Sticky right sidebar (filters) ── */}
-          <aside className="w-60 flex-shrink-0 hidden lg:block sticky top-[72px] self-start">
+          <aside className="hidden lg:block sticky top-[72px] self-start">
             <div className="max-h-[calc(100vh-6rem)] overflow-y-auto">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">סינון</p>
               <Suspense>
@@ -103,7 +113,12 @@ export default function RecipesPage({ searchParams }: Props) {
           </aside>
 
           {/* ── Main content ── */}
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0">
+            <Suspense>
+              <MobileFilterDrawer label="סינון לפי קטגוריה">
+                <RecipeTabs />
+              </MobileFilterDrawer>
+            </Suspense>
             <div className="mb-6">
               <Suspense>
                 <SearchBar placeholder="חיפוש לפי שם, מצרכים..." />
@@ -113,7 +128,21 @@ export default function RecipesPage({ searchParams }: Props) {
               <FavoritesList />
             ) : (
               <Suspense
-                fallback={<div className="text-center py-10 text-gray-400">טוען מתכונים...</div>}
+                fallback={
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                    {[1,2,3,4,5,6].map(i => (
+                      <div key={i} className="rounded-2xl bg-white border border-stone-200 overflow-hidden animate-pulse">
+                        <div className="h-48 bg-stone-200" />
+                        <div className="p-4 flex flex-col gap-2">
+                          <div className="h-3 bg-stone-200 rounded w-1/3" />
+                          <div className="h-5 bg-stone-200 rounded w-3/4" />
+                          <div className="h-3 bg-stone-200 rounded w-full" />
+                          <div className="h-3 bg-stone-200 rounded w-2/3" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                }
               >
                 <RecipeList category={category} subcategory={subcategory} q={q} />
               </Suspense>

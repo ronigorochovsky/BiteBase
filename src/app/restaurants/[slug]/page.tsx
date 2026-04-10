@@ -7,6 +7,7 @@ import { eq, and } from "drizzle-orm";
 import { RESTAURANT_AREA_LABELS } from "@/lib/constants";
 import { Badge } from "@/components/ui/Badge";
 import { EditRestaurantButton } from "@/components/EditRestaurantButton";
+import { DeleteRestaurantButton } from "@/components/DeleteRestaurantButton";
 import { StarRating } from "@/components/StarRating";
 import { Navbar } from "@/components/Navbar";
 import type { Metadata } from "next";
@@ -53,7 +54,7 @@ export default async function RestaurantPage({ params }: Props) {
           href="/restaurants"
           className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 mb-6 transition-colors"
         >
-          ← חזרה למסעדות
+          → חזרה למסעדות
         </Link>
 
         {/* Image */}
@@ -75,8 +76,9 @@ export default async function RestaurantPage({ params }: Props) {
             <Badge variant="green">
               {RESTAURANT_AREA_LABELS[restaurant.area]}
             </Badge>
-            <div className="ms-auto">
+            <div className="ms-auto flex items-center gap-2">
               <EditRestaurantButton restaurant={restaurant} />
+              <DeleteRestaurantButton slug={restaurant.slug} name={restaurant.name} />
             </div>
             {restaurant.price_range && (
               <span className="text-sm text-gray-500 font-medium">
@@ -105,6 +107,18 @@ export default async function RestaurantPage({ params }: Props) {
           <StarRating slug={restaurant.slug} initialRating={restaurant.user_rating ?? null} />
         </div>
 
+        {/* Show on map */}
+        {restaurant.lat && restaurant.lng && (
+          <div className="mb-6">
+            <Link
+              href={`/restaurants/map?highlight=${restaurant.slug}`}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors"
+            >
+              🗺️ הצג במפה
+            </Link>
+          </div>
+        )}
+
         {/* Info grid */}
         <div className="space-y-3 mb-8">
           {restaurant.address && (
@@ -123,6 +137,46 @@ export default async function RestaurantPage({ params }: Props) {
               )}
             </InfoRow>
           )}
+
+          {/* Branch locations for chains */}
+          {(() => {
+            if (!restaurant.extra_locations) return null;
+            try {
+              const branches = JSON.parse(restaurant.extra_locations) as Array<{ lat?: number; lng?: number; address?: string | null }>;
+              if (!branches.length) return null;
+              return (
+                <InfoRow icon="🏪" label="סניפים נוספים">
+                  <ul className="space-y-1">
+                    {branches.map((b, i) => (
+                      <li key={i} className="text-sm text-gray-700">
+                        {b.address ? (
+                          b.lat && b.lng ? (
+                            <a
+                              href={`https://www.google.com/maps?q=${b.lat},${b.lng}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline"
+                            >
+                              {b.address}
+                            </a>
+                          ) : b.address
+                        ) : b.lat && b.lng ? (
+                          <a
+                            href={`https://www.google.com/maps?q=${b.lat},${b.lng}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            {b.lat.toFixed(4)}, {b.lng.toFixed(4)}
+                          </a>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                </InfoRow>
+              );
+            } catch { return null; }
+          })()}
           {restaurant.phone && (
             <InfoRow icon="📞" label="טלפון">
               <a href={`tel:${restaurant.phone}`} className="text-blue-600 hover:underline">

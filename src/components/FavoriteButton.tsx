@@ -42,6 +42,7 @@ export function FavoriteButton({ recipeId, size = "sm" }: FavoriteButtonProps) {
     <button
       onClick={toggle}
       aria-label={isFav ? "הסר ממועדפים" : "הוסף למועדפים"}
+      aria-pressed={isFav}
       className="rounded-full transition-all"
       style={{
         padding: size === "sm" ? "6px" : "8px",
