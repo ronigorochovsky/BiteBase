@@ -1,9 +1,9 @@
 import Link from "next/link";
-import Image from "next/image";
 import type { Recipe } from "@/db/schema";
 import { RECIPE_CATEGORY_LABELS, RECIPE_SUBCATEGORY_LABELS, CATEGORY_COLORS } from "@/lib/constants";
 import { Badge } from "@/components/ui/Badge";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { RecipeImageWithFallback } from "@/components/RecipeImageWithFallback";
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -18,22 +18,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
       {/* Image */}
       <div className="relative h-48 bg-stone-100">
         {recipe.image_url ? (
-          recipe.image_url.startsWith("data:") ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={recipe.image_url}
-              alt={recipe.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          ) : (
-            <Image
-              src={recipe.image_url}
-              alt={recipe.title}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            />
-          )
+          <RecipeImageWithFallback src={recipe.image_url} alt={recipe.title} />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-4xl">
             🥘
