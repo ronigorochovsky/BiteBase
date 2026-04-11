@@ -6,6 +6,7 @@ import { AddRecipeSection } from "@/components/AddRecipeSection";
 import { AddRestaurantSection } from "@/components/AddRestaurantSection";
 
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 async function getCounts() {
   const [recipeCount, restaurantCount] = await Promise.all([

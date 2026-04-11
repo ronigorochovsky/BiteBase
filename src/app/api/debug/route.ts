@@ -3,6 +3,7 @@ import { recipes, restaurants } from "@/db/schema";
 import { eq, count } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 export async function GET() {
   const [recipeCount] = await db.select({ value: count() }).from(recipes).where(eq(recipes.status, "published"));
