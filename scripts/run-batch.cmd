@@ -24,6 +24,14 @@ echo.
 echo [5/5] Patching missing restaurant images from JSON...
 %NODE% %ENV% "%SCRIPTS%patch-restaurant-images-from-json.mjs"
 
+echo.
+echo [6/6] Pushing updates to GitHub...
+cd /d "%~dp0.."
+git add restaurant_output.json recipes_output_2.json batch_progress.json
+git diff --cached --quiet || git commit -m "chore: daily batch update %date%"
+git push origin master
+git push origin master:main
+
 :done
 echo.
 echo === Daily batch complete ===
