@@ -24,9 +24,33 @@ function isBlobUrl(url) {
   return url && url.includes(".public.blob.vercel-storage.com");
 }
 
+function parseOgImage(html) {
+  const m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+    ?? html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+  return m?.[1] ? m[1].replace(/&amp;/g, "&") : null;
+}
+
+// Primary: direct OG fetch using Facebook crawler UA (no rate limit)
+async function fetchImageDirect(sourceUrl) {
+  try {
+    const res = await fetch(sourceUrl, {
+      headers: {
+        "User-Agent": "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
+        "Accept": "text/html,application/xhtml+xml",
+      },
+      signal: AbortSignal.timeout(12_000),
+    });
+    if (!res.ok) return null;
+    const html = await res.text();
+    return parseOgImage(html);
+  } catch {
+    return null;
+  }
+}
+
+// Fallback: Microlink API
 async function fetchImageViaLink(sourceUrl) {
   try {
-    // Try og:image first (faster, no screenshot rendering)
     const apiUrl = `https://api.microlink.io/?url=${encodeURIComponent(sourceUrl)}&screenshot=false`;
     const res = await fetch(apiUrl, {
       signal: AbortSignal.timeout(15_000),
@@ -34,8 +58,7 @@ async function fetchImageViaLink(sourceUrl) {
     });
     if (!res.ok) return null;
     const data = await res.json();
-    const imgUrl = data?.data?.image?.url ?? data?.data?.screenshot?.url ?? null;
-    return imgUrl || null;
+    return data?.data?.image?.url ?? null;
   } catch {
     return null;
   }
@@ -43,7 +66,6 @@ async function fetchImageViaLink(sourceUrl) {
 
 async function fetchScreenshot(sourceUrl) {
   try {
-    // Fallback: request a full page screenshot
     const apiUrl = `https://api.microlink.io/?url=${encodeURIComponent(sourceUrl)}&screenshot=true`;
     const res = await fetch(apiUrl, {
       signal: AbortSignal.timeout(20_000),
@@ -96,10 +118,16 @@ for (let i = 0; i < rows.length; i++) {
   const label = `[${i + 1}/${rows.length}] ${r.title.slice(0, 50)}`;
   process.stdout.write(`${label}... `);
 
-  // Step 1: try og:image from Microlink
-  let imgUrl = await fetchImageViaLink(r.source_url);
+  // Step 1: try direct OG fetch (no rate limit)
+  let imgUrl = await fetchImageDirect(r.source_url);
 
-  // Step 2: fallback to screenshot
+  // Step 2: fallback to Microlink
+  if (!imgUrl) {
+    process.stdout.write(`(microlink) `);
+    imgUrl = await fetchImageViaLink(r.source_url);
+  }
+
+  // Step 3: fallback to Microlink screenshot
   if (!imgUrl) {
     process.stdout.write(`(screenshot) `);
     imgUrl = await fetchScreenshot(r.source_url);
