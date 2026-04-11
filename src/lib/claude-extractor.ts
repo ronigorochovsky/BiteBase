@@ -30,7 +30,7 @@ export interface ExtractionResult {
   restaurant?: ExtractedRestaurant;
 }
 
-// ── Microlink fetch ─────────────────────────────────────────────────────────
+// ── Metadata fetch ───────────────────────────────────────────────────────────
 
 interface MicrolinkData {
   imageUrl?: string;
@@ -38,7 +38,40 @@ interface MicrolinkData {
   description?: string;
 }
 
-async function fetchViaLink(url: string): Promise<MicrolinkData> {
+function parseOgTags(html: string): MicrolinkData {
+  const get = (prop: string) => {
+    const m = html.match(new RegExp(`<meta[^>]+property=["']${prop}["'][^>]+content=["']([^"']+)["']`, "i"))
+      ?? html.match(new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+property=["']${prop}["']`, "i"));
+    return m?.[1] ? decodeURIComponent(m[1].replace(/&amp;/g, "&")) : undefined;
+  };
+  return {
+    imageUrl: get("og:image"),
+    title: get("og:title"),
+    description: get("og:description"),
+  };
+}
+
+// Primary: fetch OG tags directly — works for Instagram/Facebook without any API key or rate limit
+async function fetchOgDirect(url: string): Promise<MicrolinkData> {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
+        "Accept": "text/html,application/xhtml+xml",
+        "Accept-Language": "he-IL,he;q=0.9,en;q=0.8",
+      },
+      signal: AbortSignal.timeout(12_000),
+    });
+    if (!res.ok) return {};
+    const html = await res.text();
+    return parseOgTags(html);
+  } catch {
+    return {};
+  }
+}
+
+// Fallback: Microlink API (50 req/day free tier)
+async function fetchViaMicrolink(url: string): Promise<MicrolinkData> {
   try {
     const apiUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=false`;
     const res = await fetch(apiUrl, { signal: AbortSignal.timeout(10_000) });
@@ -52,6 +85,14 @@ async function fetchViaLink(url: string): Promise<MicrolinkData> {
   } catch {
     return {};
   }
+}
+
+async function fetchViaLink(url: string): Promise<MicrolinkData> {
+  // Try direct OG fetch first (no rate limits)
+  const direct = await fetchOgDirect(url);
+  if (direct.title || direct.description || direct.imageUrl) return direct;
+  // Fallback to Microlink
+  return fetchViaMicrolink(url);
 }
 
 // ── Tool schema ─────────────────────────────────────────────────────────────
