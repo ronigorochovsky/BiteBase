@@ -30,6 +30,12 @@ export default function AdminLayout({
             >
               ייבוא WhatsApp
             </Link>
+            <Link
+              href="/admin/users"
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              משתמשים
+            </Link>
           </div>
           <Link
             href="/"

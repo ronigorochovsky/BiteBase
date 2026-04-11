@@ -35,7 +35,7 @@ function syncRestaurantJson(
       if (updates.maps_url !== undefined)       entry.maps_url      = updates.maps_url;
       if (updates.image_url !== undefined)      entry.image_url     = updates.image_url;
       if (updates.google_score !== undefined)   entry.google_score  = updates.google_score;
-      if (updates.user_rating !== undefined)    entry.user_rating   = updates.user_rating;
+      // user_rating is now managed by /api/user/ratings — not synced from PATCH
       data[idx] = entry;
     }
 
@@ -75,7 +75,6 @@ export async function PATCH(
       price_range: body.price_range || null,
       source_url: body.source_url || "",
       image_url: body.image_url || null,
-      user_rating: body.user_rating ?? null,
       updated_at: new Date(),
     })
     .where(eq(restaurants.slug, params.slug));

@@ -3,44 +3,51 @@ import { useState, useEffect, useCallback } from "react";
 import { RecipeCard } from "@/components/RecipeCard";
 import type { Recipe } from "@/db/schema";
 
-const KEY = "bitebase_favorites";
-
-function getStoredIds(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem(KEY) ?? "[]");
-  } catch {
-    return [];
-  }
-}
+const LS_KEY = "bitebase_favorites";
 
 export function FavoritesList() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    const ids = getStoredIds();
-    if (ids.length === 0) {
-      setRecipes([]);
-      setLoading(false);
-      return;
-    }
-    const res = await fetch(`/api/recipes/by-ids?ids=${ids.join(",")}`);
+    const res = await fetch("/api/user/favorites");
     const data = await res.json();
     setRecipes(data.recipes ?? []);
     setLoading(false);
   }, []);
 
+  // Migrate localStorage favorites to DB on first mount
   useEffect(() => {
-    load();
+    async function migrate() {
+      try {
+        const stored = localStorage.getItem(LS_KEY);
+        if (stored) {
+          const ids: string[] = JSON.parse(stored);
+          if (ids.length > 0) {
+            await Promise.all(
+              ids.map((id) =>
+                fetch("/api/user/favorites", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ recipeId: id }),
+                })
+              )
+            );
+            localStorage.removeItem(LS_KEY);
+          }
+        }
+      } catch {
+        // Migration is best-effort; don't block loading
+      }
+      await load();
+    }
+    migrate();
     window.addEventListener("favoritesUpdated", load);
     return () => window.removeEventListener("favoritesUpdated", load);
   }, [load]);
 
   if (loading) {
-    return (
-      <div className="text-center py-10 text-gray-400">טוען מועדפים...</div>
-    );
+    return <div className="text-center py-10 text-gray-400">טוען מועדפים...</div>;
   }
 
   if (recipes.length === 0) {

@@ -1,7 +1,10 @@
 import type { SessionOptions } from "iron-session";
 
 export interface SessionData {
-  isLoggedIn: boolean;
+  isLoggedIn: boolean;  // admin flag — keep as-is
+  userId?: string;      // approved user UUID
+  userEmail?: string;
+  userName?: string;
 }
 
 export const sessionOptions: SessionOptions = {
@@ -11,6 +14,6 @@ export const sessionOptions: SessionOptions = {
     secure: process.env.NODE_ENV === "production",
     httpOnly: true,
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge: 60 * 60 * 24 * 30, // 30 days
   },
 };

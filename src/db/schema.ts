@@ -113,6 +113,48 @@ export const comments = pgTable("comments", {
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
+// ── Users ─────────────────────────────────────────────────────────────────────
+
+export const userStatusEnum = pgEnum("user_status", [
+  "pending",
+  "approved",
+  "rejected",
+]);
+
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").notNull().unique(),
+  name: text("name").notNull(),
+  password_hash: text("password_hash").notNull(),
+  status: userStatusEnum("status").notNull().default("pending"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  approved_at: timestamp("approved_at"),
+});
+
+export const userFavorites = pgTable("user_favorites", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  user_id: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  recipe_id: uuid("recipe_id")
+    .notNull()
+    .references(() => recipes.id, { onDelete: "cascade" }),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const restaurantRatings = pgTable("restaurant_ratings", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  user_id: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  restaurant_id: uuid("restaurant_id")
+    .notNull()
+    .references(() => restaurants.id, { onDelete: "cascade" }),
+  rating: integer("rating").notNull(), // 1–5, enforced in API
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export type Recipe = typeof recipes.$inferSelect;
@@ -126,3 +168,9 @@ export type RestaurantArea = (typeof restaurantAreaEnum.enumValues)[number];
 export type EntryStatus = (typeof entryStatusEnum.enumValues)[number];
 export type Comment = typeof comments.$inferSelect;
 export type NewComment = typeof comments.$inferInsert;
+
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+export type UserStatus = (typeof userStatusEnum.enumValues)[number];
+export type UserFavorite = typeof userFavorites.$inferSelect;
+export type RestaurantRating = typeof restaurantRatings.$inferSelect;

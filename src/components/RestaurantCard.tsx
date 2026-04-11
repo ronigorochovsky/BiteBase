@@ -4,11 +4,14 @@ import type { Restaurant } from "@/db/schema";
 import { RESTAURANT_AREA_LABELS } from "@/lib/constants";
 import { Badge } from "@/components/ui/Badge";
 
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
 interface RestaurantCardProps {
   restaurant: Restaurant;
 }
 
 export function RestaurantCard({ restaurant }: RestaurantCardProps) {
+  const isNew = Date.now() - new Date(restaurant.created_at).getTime() < ONE_WEEK_MS;
   return (
     <Link
       href={`/restaurants/${restaurant.slug}`}
@@ -31,6 +34,11 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
         )}
         {/* Badges top-right */}
         <div className="absolute top-2 end-2 flex flex-col gap-1 items-end">
+          {isNew && (
+            <span className="bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">
+              חדש
+            </span>
+          )}
           {restaurant.user_rating !== null && restaurant.user_rating !== undefined && (
             <div className="bg-amber-400/90 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-0.5 text-xs font-semibold text-white shadow">
               {"★".repeat(restaurant.user_rating)}{"☆".repeat(5 - restaurant.user_rating)}

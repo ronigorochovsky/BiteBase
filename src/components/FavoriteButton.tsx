@@ -1,39 +1,34 @@
 "use client";
-import { useState, useEffect } from "react";
-
-const KEY = "bitebase_favorites";
-
-function getFavorites(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem(KEY) ?? "[]");
-  } catch {
-    return [];
-  }
-}
+import { useState } from "react";
 
 interface FavoriteButtonProps {
   recipeId: string;
   size?: "sm" | "md";
+  initialIsFav?: boolean;
 }
 
-export function FavoriteButton({ recipeId, size = "sm" }: FavoriteButtonProps) {
-  const [isFav, setIsFav] = useState(false);
+export function FavoriteButton({ recipeId, size = "sm", initialIsFav = false }: FavoriteButtonProps) {
+  const [isFav, setIsFav] = useState(initialIsFav);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    setIsFav(getFavorites().includes(recipeId));
-  }, [recipeId]);
-
-  function toggle(e: React.MouseEvent) {
+  async function toggle(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    const favs = getFavorites();
-    const next = favs.includes(recipeId)
-      ? favs.filter((id) => id !== recipeId)
-      : [...favs, recipeId];
-    localStorage.setItem(KEY, JSON.stringify(next));
-    setIsFav(!isFav);
-    window.dispatchEvent(new Event("favoritesUpdated"));
+    if (loading) return;
+
+    setLoading(true);
+    const next = !isFav;
+    try {
+      await fetch("/api/user/favorites", {
+        method: next ? "POST" : "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipeId }),
+      });
+      setIsFav(next);
+      window.dispatchEvent(new Event("favoritesUpdated"));
+    } finally {
+      setLoading(false);
+    }
   }
 
   const iconSize = size === "sm" ? "w-4 h-4" : "w-5 h-5";
@@ -43,7 +38,8 @@ export function FavoriteButton({ recipeId, size = "sm" }: FavoriteButtonProps) {
       onClick={toggle}
       aria-label={isFav ? "הסר ממועדפים" : "הוסף למועדפים"}
       aria-pressed={isFav}
-      className="rounded-full transition-all"
+      disabled={loading}
+      className="rounded-full transition-all disabled:opacity-70"
       style={{
         padding: size === "sm" ? "6px" : "8px",
         backgroundColor: isFav ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.35)",

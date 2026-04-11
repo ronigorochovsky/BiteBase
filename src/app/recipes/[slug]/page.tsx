@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { db } from "@/db";
-import { recipes } from "@/db/schema";
+import { recipes, userFavorites } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { RECIPE_CATEGORY_LABELS, RECIPE_SUBCATEGORY_LABELS, CATEGORY_COLORS } from "@/lib/constants";
 import { Badge } from "@/components/ui/Badge";
@@ -11,6 +11,7 @@ import { DeleteRecipeButton } from "@/components/DeleteRecipeButton";
 import { EditRecipeButton } from "@/components/EditRecipeButton";
 import { CommentsSection } from "@/components/CommentsSection";
 import { Navbar } from "@/components/Navbar";
+import { getSession } from "@/lib/session";
 import type { Metadata } from "next";
 
 interface Props {
@@ -43,6 +44,18 @@ export default async function RecipePage({ params }: Props) {
 
   if (!recipe) {
     notFound();
+  }
+
+  // Load user's favorite status
+  const session = await getSession();
+  let initialIsFav = false;
+  if (session.userId) {
+    const fav = await db
+      .select({ id: userFavorites.id })
+      .from(userFavorites)
+      .where(and(eq(userFavorites.user_id, session.userId), eq(userFavorites.recipe_id, recipe.id)))
+      .limit(1);
+    initialIsFav = fav.length > 0;
   }
 
   const ingredientLines = recipe.ingredients?.split("\n").filter(Boolean) ?? [];
@@ -86,7 +99,7 @@ export default async function RecipePage({ params }: Props) {
             <div className="ms-auto flex items-center gap-2">
               <EditRecipeButton recipe={recipe} />
               <DeleteRecipeButton slug={recipe.slug} name={recipe.title} />
-              <FavoriteButton recipeId={recipe.id} size="md" />
+              <FavoriteButton recipeId={recipe.id} size="md" initialIsFav={initialIsFav} />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">

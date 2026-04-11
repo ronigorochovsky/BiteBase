@@ -5,11 +5,16 @@ import { Badge } from "@/components/ui/Badge";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { RecipeImageWithFallback } from "@/components/RecipeImageWithFallback";
 
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
 interface RecipeCardProps {
   recipe: Recipe;
+  initialIsFav?: boolean;
 }
 
-export function RecipeCard({ recipe }: RecipeCardProps) {
+export function RecipeCard({ recipe, initialIsFav = false }: RecipeCardProps) {
+  const isNew = Date.now() - new Date(recipe.created_at).getTime() < ONE_WEEK_MS;
+
   return (
     <Link
       href={`/recipes/${recipe.slug}`}
@@ -26,8 +31,16 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
         )}
         {/* Favorite heart */}
         <div className="absolute top-2 start-2">
-          <FavoriteButton recipeId={recipe.id} size="sm" />
+          <FavoriteButton recipeId={recipe.id} size="sm" initialIsFav={initialIsFav} />
         </div>
+        {/* New badge */}
+        {isNew && (
+          <div className="absolute top-2 end-2">
+            <span className="bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">
+              חדש
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Content */}

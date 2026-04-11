@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { db } from "@/db";
-import { recipes } from "@/db/schema";
+import { recipes, userFavorites } from "@/db/schema";
 import { eq, and, desc, or, ilike } from "drizzle-orm";
 import type { RecipeCategory, RecipeSubcategory } from "@/db/schema";
 import { RECIPE_CATEGORY_LABELS, RECIPE_CATEGORIES } from "@/lib/constants";
@@ -10,6 +10,7 @@ import { FavoritesList } from "@/components/FavoritesList";
 import { SearchBar } from "@/components/SearchBar";
 import { Navbar } from "@/components/Navbar";
 import { MobileFilterDrawer } from "@/components/MobileFilterDrawer";
+import { getSession } from "@/lib/session";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -46,11 +47,20 @@ async function RecipeList({ category, subcategory, q }: { category?: string; sub
     );
   }
 
-  const items = await db
-    .select()
-    .from(recipes)
-    .where(and(...conditions))
-    .orderBy(desc(recipes.created_at));
+  const [items, session] = await Promise.all([
+    db.select().from(recipes).where(and(...conditions)).orderBy(desc(recipes.created_at)),
+    getSession(),
+  ]);
+
+  // Load user's favorite IDs
+  let favIds = new Set<string>();
+  if (session.userId) {
+    const favRows = await db
+      .select({ recipe_id: userFavorites.recipe_id })
+      .from(userFavorites)
+      .where(eq(userFavorites.user_id, session.userId));
+    favIds = new Set(favRows.map((r) => r.recipe_id));
+  }
 
   const rowPad = items.length === 0 ? 3 : (3 - (items.length % 3)) % 3;
   const minPad = Math.max(0, 6 - items.length);
@@ -66,7 +76,7 @@ async function RecipeList({ category, subcategory, q }: { category?: string; sub
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
         {items.map((recipe) => (
-          <RecipeCard key={recipe.id} recipe={recipe} />
+          <RecipeCard key={recipe.id} recipe={recipe} initialIsFav={favIds.has(recipe.id)} />
         ))}
         {Array.from({ length: padCount }).map((_, i) => (
           <div key={`pad-${i}`} className="flex flex-col rounded-2xl bg-white border border-stone-200 overflow-hidden opacity-0 pointer-events-none" aria-hidden="true">

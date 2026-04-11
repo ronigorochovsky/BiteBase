@@ -18,6 +18,7 @@
     "@anthropic-ai/sdk": "^0.30.0",
     "@neondatabase/serverless": "^0.9.5",
     "@vercel/blob": "^2.3.3",
+    "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.33.0",
     "iron-session": "^8.0.4",
@@ -30,6 +31,7 @@
     "whatsapp-chat-parser": "^4.0.2"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^20",
     "@types/react": "^18",

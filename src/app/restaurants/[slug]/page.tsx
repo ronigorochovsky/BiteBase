@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { db } from "@/db";
-import { restaurants } from "@/db/schema";
+import { restaurants, restaurantRatings } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { RESTAURANT_AREA_LABELS } from "@/lib/constants";
 import { Badge } from "@/components/ui/Badge";
@@ -10,6 +10,7 @@ import { EditRestaurantButton } from "@/components/EditRestaurantButton";
 import { DeleteRestaurantButton } from "@/components/DeleteRestaurantButton";
 import { StarRating } from "@/components/StarRating";
 import { Navbar } from "@/components/Navbar";
+import { getSession } from "@/lib/session";
 import type { Metadata } from "next";
 
 interface Props {
@@ -43,6 +44,18 @@ export default async function RestaurantPage({ params }: Props) {
 
   if (!restaurant) {
     notFound();
+  }
+
+  // Load user's own rating
+  const session = await getSession();
+  let userRating: number | null = null;
+  if (session.userId) {
+    const [row] = await db
+      .select({ rating: restaurantRatings.rating })
+      .from(restaurantRatings)
+      .where(and(eq(restaurantRatings.user_id, session.userId), eq(restaurantRatings.restaurant_id, restaurant.id)))
+      .limit(1);
+    userRating = row?.rating ?? null;
   }
 
   return (
@@ -104,7 +117,11 @@ export default async function RestaurantPage({ params }: Props) {
 
         {/* Star rating */}
         <div className="mb-6">
-          <StarRating slug={restaurant.slug} initialRating={restaurant.user_rating ?? null} />
+          <StarRating
+            restaurantId={restaurant.id}
+            initialRating={userRating}
+            initialAverageRating={restaurant.user_rating ?? null}
+          />
         </div>
 
         {/* Show on map */}
