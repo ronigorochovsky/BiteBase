@@ -3,6 +3,7 @@ import { recipes } from "@/db/schema";
 import { generateSlug } from "@/lib/utils";
 import { RECIPE_CATEGORY_LABELS, RECIPE_SUBCATEGORY_LABELS } from "@/lib/constants";
 import { extractFromUrl } from "@/lib/claude-extractor";
+import { uploadImageToBlob, isBlobUrl } from "@/lib/upload-image";
 import { randomUUID } from "crypto";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
@@ -103,6 +104,14 @@ export async function POST(request: Request) {
 
     const { recipe, imageUrl } = result;
 
+    // Upload image to Vercel Blob for permanent storage
+    let permanentImageUrl = imageUrl ?? null;
+    if (imageUrl && !isBlobUrl(imageUrl)) {
+      const slug_preview = recipe.title.slice(0, 40).replace(/\s+/g, "-");
+      const blobUrl = await uploadImageToBlob(imageUrl, `recipes/${slug_preview}-${Date.now()}.jpg`);
+      if (blobUrl) permanentImageUrl = blobUrl;
+    }
+
     const slug = await saveRecipe({
       name: recipe.title,
       category: recipe.category ?? "other",
@@ -110,7 +119,7 @@ export async function POST(request: Request) {
       ingredients: recipe.ingredients ?? undefined,
       steps: recipe.steps ?? undefined,
       source_url: url,
-      image_url: imageUrl ?? null,
+      image_url: permanentImageUrl,
     });
 
     return Response.json({ ok: true, slug, title: recipe.title });
