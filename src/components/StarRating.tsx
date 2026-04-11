@@ -35,6 +35,25 @@ export function StarRating({ restaurantId, initialRating, initialAverageRating, 
 
   const display = hover ?? userRating ?? 0;
 
+  const StarRow = ({ value }: { value: number }) => (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <svg
+          key={n}
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill={n <= value ? "#f59e0b" : "none"}
+          stroke={n <= value ? "#f59e0b" : "#d1d5db"}
+          strokeWidth="1.5"
+        >
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      ))}
+    </div>
+  );
+
   return (
     <div className="space-y-2">
       {/* User's own rating */}
@@ -70,27 +89,16 @@ export function StarRating({ restaurantId, initialRating, initialAverageRating, 
         )}
       </div>
 
-      {/* Community average */}
+      {/* Community average — same format as user row */}
       {totalRatings > 0 && averageRating !== null && (
-        <div className="flex items-center gap-2 ps-1">
-          <div className="flex items-center gap-0.5">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <svg
-                key={n}
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill={n <= averageRating ? "#f59e0b" : "none"}
-                stroke={n <= averageRating ? "#f59e0b" : "#d1d5db"}
-                strokeWidth="1.5"
-              >
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-              </svg>
-            ))}
-          </div>
-          <span className="text-xs text-gray-500">
-            {averageRating}/5 ממוצע ({totalRatings} {totalRatings === 1 ? "דירוג" : "דירוגים"})
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-500 font-medium">דירוג כולל:</span>
+          <StarRow value={averageRating} />
+          <span className="text-sm font-semibold text-amber-600">
+            {averageRating}/5
+          </span>
+          <span className="text-xs text-gray-400">
+            ({totalRatings} {totalRatings === 1 ? "דירוג" : "דירוגים"})
           </span>
         </div>
       )}

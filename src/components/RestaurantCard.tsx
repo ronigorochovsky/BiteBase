@@ -40,8 +40,9 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
             </span>
           )}
           {restaurant.user_rating !== null && restaurant.user_rating !== undefined && (
-            <div className="bg-amber-400/90 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-0.5 text-xs font-semibold text-white shadow">
-              {"★".repeat(restaurant.user_rating)}{"☆".repeat(5 - restaurant.user_rating)}
+            <div className="bg-amber-400/90 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1 text-xs font-semibold text-white shadow">
+              <span>{"★".repeat(restaurant.user_rating)}</span>
+              <span>{restaurant.user_rating}/5</span>
             </div>
           )}
           {restaurant.google_score && (
