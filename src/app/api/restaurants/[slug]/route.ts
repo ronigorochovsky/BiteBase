@@ -83,6 +83,23 @@ export async function PATCH(
     syncRestaurantJson("update", current, body);
   }
 
+  // Auto-geocode when address is updated
+  if (body.address) {
+    try {
+      const geo = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(body.address)}&format=json&limit=1`,
+        { headers: { "User-Agent": "BiteBase/1.0" } }
+      );
+      const results = await geo.json();
+      if (results[0]) {
+        await db
+          .update(restaurants)
+          .set({ lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) })
+          .where(eq(restaurants.slug, params.slug));
+      }
+    } catch { /* non-fatal — geocode failure shouldn't block the save */ }
+  }
+
   return Response.json({ ok: true });
 }
 
