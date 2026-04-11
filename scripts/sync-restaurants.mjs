@@ -68,19 +68,26 @@ async function main() {
       let existing = [];
       if (source_url) {
         existing = await sql`
-          SELECT id, lat, lng, address, phone, opening_hours, image_url
+          SELECT id, lat, lng, address, phone, opening_hours, image_url, status
           FROM restaurants WHERE source_url = ${source_url} LIMIT 1
         `;
       }
       if (existing.length === 0) {
         existing = await sql`
-          SELECT id, lat, lng, address, phone, opening_hours, image_url
+          SELECT id, lat, lng, address, phone, opening_hours, image_url, status
           FROM restaurants WHERE name = ${name} LIMIT 1
         `;
       }
 
       if (existing.length > 0) {
         const row = existing[0];
+
+        // Skip soft-deleted records — never re-publish them
+        if (row.status === "rejected") {
+          process.stdout.write(" [skipped — deleted]\n");
+          skipped++;
+          continue;
+        }
 
         // Only update null/empty fields — never overwrite good data
         const hasNewData =

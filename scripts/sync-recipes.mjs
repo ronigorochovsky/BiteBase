@@ -97,19 +97,27 @@ async function main() {
       let existing = [];
       if (source_url) {
         existing = await sql`
-          SELECT id, image_url, ingredients, steps
+          SELECT id, image_url, ingredients, steps, status
           FROM recipes WHERE source_url = ${source_url} LIMIT 1
         `;
       }
       if (existing.length === 0) {
         existing = await sql`
-          SELECT id, image_url, ingredients, steps
+          SELECT id, image_url, ingredients, steps, status
           FROM recipes WHERE title = ${title} LIMIT 1
         `;
       }
 
       if (existing.length > 0) {
         const row = existing[0];
+
+        // Skip soft-deleted records — never re-publish them
+        if (row.status === "rejected") {
+          process.stdout.write(" [skipped — deleted]\n");
+          skipped++;
+          continue;
+        }
+
         const hasNewData =
           (image_url && !row.image_url) ||
           (ingredients && !row.ingredients) ||
