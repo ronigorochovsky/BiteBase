@@ -25,7 +25,8 @@ function LoginForm() {
 
       if (res.ok) {
         const from = searchParams.get("from") ?? "/admin";
-        router.push(from);
+        // Full page reload so the new session cookie is sent on the next request
+        window.location.href = from;
       } else {
         setError("סיסמה שגויה");
       }
