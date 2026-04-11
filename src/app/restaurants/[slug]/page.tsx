@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { db } from "@/db";
 import { restaurants, restaurantRatings } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, count } from "drizzle-orm";
 import { RESTAURANT_AREA_LABELS } from "@/lib/constants";
 import { Badge } from "@/components/ui/Badge";
 import { EditRestaurantButton } from "@/components/EditRestaurantButton";
@@ -46,9 +46,17 @@ export default async function RestaurantPage({ params }: Props) {
     notFound();
   }
 
-  // Load user's own rating
+  // Load user's own rating + total rating count
   const session = await getSession();
   let userRating: number | null = null;
+  let totalRatings = 0;
+
+  const [countRow] = await db
+    .select({ total: count() })
+    .from(restaurantRatings)
+    .where(eq(restaurantRatings.restaurant_id, restaurant.id));
+  totalRatings = countRow?.total ?? 0;
+
   if (session.userId) {
     const [row] = await db
       .select({ rating: restaurantRatings.rating })
@@ -121,6 +129,7 @@ export default async function RestaurantPage({ params }: Props) {
             restaurantId={restaurant.id}
             initialRating={userRating}
             initialAverageRating={restaurant.user_rating ?? null}
+            initialTotalRatings={totalRatings}
           />
         </div>
 

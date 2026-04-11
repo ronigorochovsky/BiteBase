@@ -3,13 +3,15 @@ import { useState } from "react";
 
 interface Props {
   restaurantId: string;
-  initialRating: number | null;       // this user's rating
+  initialRating: number | null;        // this user's rating
   initialAverageRating: number | null; // community average (restaurants.user_rating)
+  initialTotalRatings?: number;        // total number of raters
 }
 
-export function StarRating({ restaurantId, initialRating, initialAverageRating }: Props) {
+export function StarRating({ restaurantId, initialRating, initialAverageRating, initialTotalRatings = 0 }: Props) {
   const [userRating, setUserRating] = useState<number | null>(initialRating);
   const [averageRating, setAverageRating] = useState<number | null>(initialAverageRating);
+  const [totalRatings, setTotalRatings] = useState(initialTotalRatings);
   const [hover, setHover] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -25,6 +27,7 @@ export function StarRating({ restaurantId, initialRating, initialAverageRating }
       const data = await res.json();
       setUserRating(data.userRating);
       setAverageRating(data.newAverage);
+      if (data.totalRatings !== undefined) setTotalRatings(data.totalRatings);
     } finally {
       setSaving(false);
     }
@@ -33,7 +36,8 @@ export function StarRating({ restaurantId, initialRating, initialAverageRating }
   const display = hover ?? userRating ?? 0;
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
+      {/* User's own rating */}
       <div className="flex items-center gap-3">
         <span className="text-sm text-gray-500 font-medium">הדירוג שלי:</span>
         <div role="group" aria-label="דירוג" className="flex items-center gap-0.5">
@@ -65,10 +69,30 @@ export function StarRating({ restaurantId, initialRating, initialAverageRating }
           <span className="text-sm font-semibold text-amber-600">{userRating}/5</span>
         )}
       </div>
-      {averageRating !== null && (
-        <p className="text-xs text-gray-400 pe-1">
-          ממוצע קהילתי: {averageRating}/5
-        </p>
+
+      {/* Community average */}
+      {totalRatings > 0 && averageRating !== null && (
+        <div className="flex items-center gap-2 ps-1">
+          <div className="flex items-center gap-0.5">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <svg
+                key={n}
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill={n <= averageRating ? "#f59e0b" : "none"}
+                stroke={n <= averageRating ? "#f59e0b" : "#d1d5db"}
+                strokeWidth="1.5"
+              >
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+            ))}
+          </div>
+          <span className="text-xs text-gray-500">
+            {averageRating}/5 ממוצע ({totalRatings} {totalRatings === 1 ? "דירוג" : "דירוגים"})
+          </span>
+        </div>
       )}
     </div>
   );

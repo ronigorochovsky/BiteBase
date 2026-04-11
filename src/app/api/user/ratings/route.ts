@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { restaurantRatings, restaurants } from "@/db/schema";
-import { eq, and, avg } from "drizzle-orm";
+import { eq, and, avg, count } from "drizzle-orm";
 import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -37,18 +37,19 @@ export async function POST(request: Request) {
       });
   }
 
-  // Recompute average and update cached column
-  const [avgResult] = await db
-    .select({ average: avg(restaurantRatings.rating) })
+  // Recompute average + count and update cached column
+  const [aggResult] = await db
+    .select({ average: avg(restaurantRatings.rating), total: count() })
     .from(restaurantRatings)
     .where(eq(restaurantRatings.restaurant_id, restaurantId));
 
-  const newAverage = avgResult?.average ? Math.round(Number(avgResult.average)) : null;
+  const newAverage = aggResult?.average ? Math.round(Number(aggResult.average)) : null;
+  const totalRatings = aggResult?.total ?? 0;
 
   await db
     .update(restaurants)
     .set({ user_rating: newAverage })
     .where(eq(restaurants.id, restaurantId));
 
-  return Response.json({ ok: true, newAverage, userRating: rating ?? null });
+  return Response.json({ ok: true, newAverage, userRating: rating ?? null, totalRatings });
 }
