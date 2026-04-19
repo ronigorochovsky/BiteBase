@@ -7,6 +7,8 @@ import { randomUUID } from "crypto";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
+export const maxDuration = 60;
+
 const JSON_PATH = join(process.cwd(), "restaurants_output.json");
 
 function readJson(): object[] {
@@ -54,36 +56,40 @@ async function saveRestaurant(entry: {
     status: "published",
   });
 
-  // Append to JSON file
-  const existing = readJson();
-  const areaKey = entry.area as keyof typeof RESTAURANT_AREA_LABELS;
-  writeFileSync(
-    JSON_PATH,
-    JSON.stringify(
-      [
-        ...existing,
-        {
-          name: entry.name,
-          area: entry.area,
-          area_he: RESTAURANT_AREA_LABELS[areaKey] ?? "",
-          style: entry.concept ?? null,
-          address: entry.address ?? null,
-          description: entry.description ?? null,
-          website_url: entry.website_url ?? null,
-          maps_url: entry.maps_url ?? null,
-          opening_hours: entry.opening_hours ?? null,
-          phone: entry.phone ?? null,
-          google_score: entry.google_score ?? null,
-          source_url: entry.source_url,
-          image_url: entry.image_url ?? null,
-          sentAt: new Date().toLocaleString("he-IL"),
-        },
-      ],
-      null,
-      2
-    ),
-    "utf8"
-  );
+  // Append to JSON file (best-effort — Vercel has a read-only filesystem so this may fail)
+  try {
+    const existing = readJson();
+    const areaKey = entry.area as keyof typeof RESTAURANT_AREA_LABELS;
+    writeFileSync(
+      JSON_PATH,
+      JSON.stringify(
+        [
+          ...existing,
+          {
+            name: entry.name,
+            area: entry.area,
+            area_he: RESTAURANT_AREA_LABELS[areaKey] ?? "",
+            style: entry.concept ?? null,
+            address: entry.address ?? null,
+            description: entry.description ?? null,
+            website_url: entry.website_url ?? null,
+            maps_url: entry.maps_url ?? null,
+            opening_hours: entry.opening_hours ?? null,
+            phone: entry.phone ?? null,
+            google_score: entry.google_score ?? null,
+            source_url: entry.source_url,
+            image_url: entry.image_url ?? null,
+            sentAt: new Date().toLocaleString("he-IL"),
+          },
+        ],
+        null,
+        2
+      ),
+      "utf8"
+    );
+  } catch {
+    // Silently skip — DB insert above already succeeded
+  }
 
   return slug;
 }
